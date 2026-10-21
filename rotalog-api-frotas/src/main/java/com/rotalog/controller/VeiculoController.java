@@ -43,6 +43,21 @@ public class VeiculoController {
     }
 
     /**
+     * Buscar veículo por id
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+        try {
+            Veiculo veiculo = veiculoService.buscarPorId(id);
+            return ResponseEntity.ok(veiculo);
+        } catch (RuntimeException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("erro", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+    /**
      * Buscar veículo por placa
      */
     @GetMapping("/placa/{placa}")

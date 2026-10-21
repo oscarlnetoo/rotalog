@@ -42,6 +42,14 @@ public class VeiculoService {
     }
 
     /**
+     * Busca veículo por id
+     */
+    public Veiculo buscarPorId(Long id) {
+        return veiculoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Veículo não encontrado: " + id));
+    }
+
+    /**
      * Busca veículo por placa
      */
     public Veiculo buscarPorPlaca(String placa) {
