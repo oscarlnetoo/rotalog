@@ -51,6 +51,10 @@ requests.http        # Manual request collection
 - Never print or copy secrets from `.env` into responses, logs or other files.
 - Known issues are catalogued in `../TECH_DEBT_MAP.md` (section 2) — check it before diagnosing.
 
+## Git
+- Follow the Commit Conventions and Git workflow in the root `CLAUDE.md` (scope: `api-entregas`).
+- Once your change is complete and verified, commit it yourself — do not wait to be asked.
+
 ## Commands
 - Install: `npm install`
 - Run: `npm start` (or `npm run dev` with nodemon); requires PostgreSQL from `rotalog-workspace`

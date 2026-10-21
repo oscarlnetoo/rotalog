@@ -49,6 +49,10 @@ src/main/resources/
 - When adding features, follow the existing style of the surrounding code unless asked otherwise.
 - Known issues are catalogued in `../TECH_DEBT_MAP.md` (section 1) — check it before diagnosing.
 
+## Git
+- Follow the Commit Conventions and Git workflow in the root `CLAUDE.md` (scope: `api-frotas`).
+- Once your change is complete and its tests pass, commit it yourself — do not wait to be asked.
+
 ## Commands
 - Run: `mvn spring-boot:run` (requires PostgreSQL from `rotalog-workspace`)
 - Compile: `mvn compile`

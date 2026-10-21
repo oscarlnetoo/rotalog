@@ -49,6 +49,10 @@ requests.http     # Manual request collection
 - When adding features, follow the existing style of the surrounding code unless asked otherwise.
 - Known issues are catalogued in `../TECH_DEBT_MAP.md` (section 3) — check it before diagnosing.
 
+## Git
+- Follow the Commit Conventions and Git workflow in the root `CLAUDE.md` (scope: `api-notificacoes`).
+- Once your change is complete and verified, commit it yourself — do not wait to be asked.
+
 ## Commands
 - Restore: `dotnet restore`
 - Build: `dotnet build`

@@ -50,6 +50,10 @@ libs/
 - Known issues are catalogued in `../TECH_DEBT_MAP.md` (section 4) — check it before diagnosing.
 - Follow `rotalog-frontend/CLAUDE.md`: always run tasks through NX, never the underlying tool directly, and never guess NX CLI flags (check `--help`).
 
+## Git
+- Follow the Commit Conventions and Git workflow in the root `CLAUDE.md` (scope: `frontend`).
+- Once your change is complete and the relevant NX tests and lint pass, commit it yourself — do not wait to be asked.
+
 ## Commands
 - Install: `npm install`
 - Serve: `npx nx serve painel-admin`, `npx nx serve rastreamento` (both: `npx nx run-many --target=serve --projects=painel-admin,rastreamento`)

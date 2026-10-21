@@ -45,6 +45,10 @@ CLAUDE_CONTEXT.md         # Project history and guidance (Portuguese)
 - `docker-compose down -v` **destroys all data** — never run it without explicit confirmation from the user.
 - Known issues are catalogued in `../TECH_DEBT_MAP.md` — check it before diagnosing.
 
+## Git
+- Follow the Commit Conventions and Git workflow in the root `CLAUDE.md` (scope: `workspace`).
+- Once your change is complete and verified (scripts run cleanly on a fresh database), commit it yourself — do not wait to be asked.
+
 ## Commands
 - Start: `docker-compose up -d`
 - Status / logs: `docker-compose ps`, `docker-compose logs postgres`
