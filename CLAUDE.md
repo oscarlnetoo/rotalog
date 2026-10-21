@@ -67,3 +67,9 @@ If a change touches more than one scope, prefer splitting it into separate commi
 
 ### Constraints
 - Never add trailers or attribution lines to a commit message.
+
+## Git workflow
+- Test before committing. Verify the change really works and has no side effects (run the relevant tests and lint) before committing.
+- Commit related changes together. One commit wraps one logical change; two unrelated fixes are two commits.
+- Commit often. Small, frequent commits stay focused and make integration easier.
+- Don't commit half-done work. Commit only when a logical component is complete.
