@@ -1,0 +1,3 @@
+# Keep local env files out of the shared repo
+.env
+**/.env
