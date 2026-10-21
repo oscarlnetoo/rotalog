@@ -1,8 +1,12 @@
 package com.rotalog.controller;
 
 import com.rotalog.domain.Veiculo;
+import com.rotalog.dto.EstatisticasFrotaResponse;
 import com.rotalog.dto.VeiculoRequest;
+import com.rotalog.service.VeiculoEstatisticasService;
+import com.rotalog.service.VeiculoQuilometragemService;
 import com.rotalog.service.VeiculoService;
+import com.rotalog.service.VeiculoStatusService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +33,15 @@ public class VeiculoController {
 
     @Autowired // FIXME: deveria usar injeção por construtor
     private VeiculoService veiculoService;
+
+    @Autowired
+    private VeiculoStatusService veiculoStatusService;
+
+    @Autowired
+    private VeiculoQuilometragemService veiculoQuilometragemService;
+
+    @Autowired
+    private VeiculoEstatisticasService veiculoEstatisticasService;
 
     /**
      * Listar todos os veículos
@@ -144,7 +157,7 @@ public class VeiculoController {
                 error.put("erro", "Campo 'quilometragem' é obrigatório");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
-            Veiculo veiculo = veiculoService.atualizarQuilometragem(id, quilometragem);
+            Veiculo veiculo = veiculoQuilometragemService.atualizarQuilometragem(id, quilometragem);
             return ResponseEntity.ok(veiculo);
         } catch (RuntimeException e) {
             Map<String, String> error = new HashMap<>();
@@ -159,7 +172,7 @@ public class VeiculoController {
     @PatchMapping("/{id}/desativar")
     public ResponseEntity<?> desativarVeiculo(@PathVariable Long id) {
         try {
-            Veiculo veiculo = veiculoService.desativarVeiculo(id);
+            Veiculo veiculo = veiculoStatusService.desativarVeiculo(id);
             return ResponseEntity.ok(veiculo);
         } catch (RuntimeException e) {
             Map<String, String> error = new HashMap<>();
@@ -174,7 +187,7 @@ public class VeiculoController {
     @PatchMapping("/{id}/reativar")
     public ResponseEntity<?> reativarVeiculo(@PathVariable Long id) {
         try {
-            Veiculo veiculo = veiculoService.reativarVeiculo(id);
+            Veiculo veiculo = veiculoStatusService.reativarVeiculo(id);
             return ResponseEntity.ok(veiculo);
         } catch (RuntimeException e) {
             Map<String, String> error = new HashMap<>();
@@ -185,13 +198,9 @@ public class VeiculoController {
 
     /**
      * Obter estatísticas da frota
-     * 
-     * FIXME: Retorna String JSON em vez de objeto tipado
      */
     @GetMapping("/estatisticas")
-    public ResponseEntity<String> obterEstatisticas() {
-        // FIXME: Chamando método com typo no nome
-        String stats = veiculoService.obterEstatisticasFreita();
-        return ResponseEntity.ok(stats);
+    public ResponseEntity<EstatisticasFrotaResponse> obterEstatisticas() {
+        return ResponseEntity.ok(veiculoEstatisticasService.obterEstatisticas());
     }
 }

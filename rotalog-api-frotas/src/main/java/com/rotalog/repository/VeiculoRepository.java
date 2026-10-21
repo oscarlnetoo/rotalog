@@ -23,6 +23,8 @@ public interface VeiculoRepository extends JpaRepository<Veiculo, Long> {
 
     List<Veiculo> findByStatus(String status);
 
+    long countByStatus(String status);
+
     // FIXME: Query nativa quando poderia ser derived query
     @Query(value = "SELECT * FROM veiculos WHERE quilometragem > :km", nativeQuery = true)
     List<Veiculo> findVeiculosComQuilometragemAcimaDe(@Param("km") Long quilometragem);
