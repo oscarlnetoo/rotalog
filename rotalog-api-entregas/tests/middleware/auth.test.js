@@ -1,4 +1,4 @@
-const authMiddleware = require('../../src/middleware/auth');
+const { createAuthMiddleware } = require('../../src/middleware/auth');
 
 describe('authMiddleware', () => {
     const originalEnv = process.env.NODE_ENV;
@@ -20,27 +20,29 @@ describe('authMiddleware', () => {
         jest.restoreAllMocks();
     });
 
-    describe('fora de produção', () => {
-        it.each(['development', 'test', undefined])('ignora a autenticação quando NODE_ENV=%s', (env) => {
-            if (env === undefined) {
-                delete process.env.NODE_ENV;
-            } else {
-                process.env.NODE_ENV = env;
-            }
+    describe('AUTH_MODE=off', () => {
+        it('ignora a autenticação', () => {
             const req = buildReq();
 
-            authMiddleware(req, res, next);
+            createAuthMiddleware({ mode: 'off' })(req, res, next);
 
             expect(next).toHaveBeenCalledTimes(1);
             expect(res.status).not.toHaveBeenCalled();
             expect(req.user).toBeUndefined();
         });
+
+        it('não depende de NODE_ENV', () => {
+            process.env.NODE_ENV = 'production';
+            const req = buildReq();
+
+            createAuthMiddleware({ mode: 'off' })(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+        });
     });
 
-    describe('em produção', () => {
-        beforeEach(() => {
-            process.env.NODE_ENV = 'production';
-        });
+    describe('AUTH_MODE=enforce', () => {
+        const authMiddleware = (req, res, next) => createAuthMiddleware({ mode: 'enforce' })(req, res, next);
 
         it('retorna 401 quando o header Authorization não existe', () => {
             authMiddleware(buildReq(), res, next);

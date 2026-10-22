@@ -7,18 +7,20 @@ jest.mock('../../src/models', () => {
 });
 
 describe('montagem das rotas (caracterização, NODE_ENV=production)', () => {
-    const originalEnv = process.env.NODE_ENV;
+    const originalEnv = { ...process.env };
     let app;
 
     beforeAll(() => {
         process.env.NODE_ENV = 'production';
+        process.env.AUTH_MODE = 'enforce';
+        process.env.JWT_SECRET = 'test-secret-with-at-least-32-bytes!!';
         jest.spyOn(console, 'log').mockImplementation(() => {});
         jest.spyOn(console, 'error').mockImplementation(() => {});
         app = require('../../src/index');
     });
 
     afterAll(() => {
-        process.env.NODE_ENV = originalEnv;
+        process.env = originalEnv;
         jest.restoreAllMocks();
     });
 

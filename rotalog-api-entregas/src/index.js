@@ -17,6 +17,19 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+// Auth config: validated once, before anything else. Invalid config = exit 1.
+const { loadAuthConfig } = require('./config/auth');
+let authConfig;
+try {
+    authConfig = loadAuthConfig();
+} catch (error) {
+    console.error('Configuração de autenticação inválida:', error.message);
+    process.exit(1);
+}
+if (authConfig.mode === 'off') {
+    console.warn('[AUTH] AUTH_MODE=off: autenticação e autorização DESATIVADAS (apenas desenvolvimento local)');
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -27,7 +40,8 @@ const { sequelize, testConnection } = require('./config/database');
 require('./models');
 
 // Middleware
-const authMiddleware = require('./middleware/auth');
+const { createAuthMiddleware } = require('./middleware/auth');
+const authMiddleware = createAuthMiddleware(authConfig);
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 // FIXME: CORS permite tudo - inseguro

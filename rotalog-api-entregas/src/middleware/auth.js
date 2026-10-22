@@ -1,51 +1,41 @@
 /**
- * Auth Middleware - Copied from StackOverflow (2020)
- * 
- * FIXME: JWT secret hardcoded
- * FIXME: Sem validação real do token
+ * Auth Middleware factory
+ *
+ * FIXME: Sem validação real do token (próximo passo: tokenService)
  * FIXME: Sem refresh token
  * FIXME: Sem role-based access control
- * FIXME: Bypass em desenvolvimento
  */
 
-// FIXME: Hardcoded secret
-const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-that-should-not-be-hardcoded';
+function createAuthMiddleware(config) {
+    return function authMiddleware(req, res, next) {
+        if (config.mode === 'off') {
+            return next();
+        }
 
-function authMiddleware(req, res, next) {
-    // FIXME: Bypass total em desenvolvimento
-    if (process.env.NODE_ENV !== 'production') {
-        console.log('[AUTH] Bypass em desenvolvimento'); // FIXME: usar logger
-        return next();
-    }
+        var authHeader = req.headers.authorization;
 
-    var authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).json({ error: 'Token não fornecido' });
+        }
 
-    if (!authHeader) {
-        return res.status(401).json({ error: 'Token não fornecido' });
-    }
+        // FIXME: Apenas verifica se header existe, não valida o token
+        var parts = authHeader.split(' ');
+        if (parts.length !== 2 || parts[0] !== 'Bearer') {
+            return res.status(401).json({ error: 'Token mal formatado' });
+        }
 
-    // FIXME: Apenas verifica se header existe, não valida o token
-    var parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-        return res.status(401).json({ error: 'Token mal formatado' });
-    }
+        var token = parts[1];
 
-    var token = parts[1];
+        // FIXME: "Validação" fake - apenas verifica se não está vazio
+        if (!token || token.length < 10) {
+            return res.status(401).json({ error: 'Token inválido' });
+        }
 
-    // FIXME: "Validação" fake - apenas verifica se não está vazio
-    if (!token || token.length < 10) {
-        return res.status(401).json({ error: 'Token inválido' });
-    }
+        // FIXME: User fake
+        req.user = { id: 1, nome: 'Admin', role: 'admin' };
 
-    // FIXME: Sem decodificação real do JWT
-    // FIXME: Sem verificação de expiração
-    // FIXME: Sem verificação de assinatura
-    console.log('[AUTH] Token aceito (sem validação real)'); // FIXME: usar logger
-
-    // FIXME: User fake
-    req.user = { id: 1, nome: 'Admin', role: 'admin' };
-
-    next();
+        next();
+    };
 }
 
-module.exports = authMiddleware;
+module.exports = { createAuthMiddleware };
