@@ -57,6 +57,53 @@ paths:
                 items:
                   $ref: '#/components/schemas/Entrega'
 
+  /api/alertas-manutencao:
+    get:
+      summary: Listar alertas de manutenção preventiva
+      tags:
+        - Alertas de manutenção
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Filtro de status (sem diferenciar maiúsculas de minúsculas)
+          schema:
+            type: string
+            enum: [PENDENTE, ENVIADO, FALHA]
+      responses:
+        '200':
+          description: Lista ordenada por dataCriacao decrescente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlertaManutencao'
+        '400':
+          description: Status inválido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  erro:
+                    type: string
+
+  /api/alertas-manutencao/verificar:
+    post:
+      summary: Verificar veículos e gerar alertas de manutenção preventiva
+      tags:
+        - Alertas de manutenção
+      responses:
+        '200':
+          description: Verificação executada (inclusive se api-notificacoes estiver fora do ar)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificacaoAlertas'
+        '500':
+          description: Erro interno
+
   # TODO: Endpoints que não existem mais
   /api/rastreamento/real-time:
     get:
@@ -93,6 +140,84 @@ components:
           enum: [ativo, inativo, manutencao]
         quilometragem:
           type: number
+
+    AlertaManutencao:
+      type: object
+      properties:
+        id:
+          type: integer
+        veiculoId:
+          type: integer
+        placa:
+          type: string
+        modelo:
+          type: string
+          nullable: true
+        motivo:
+          type: string
+          enum: [QUILOMETRAGEM, TEMPO, AMBOS]
+        quilometragemAtual:
+          type: integer
+          nullable: true
+        limiteQuilometragem:
+          type: integer
+          nullable: true
+        dataUltimaManutencao:
+          type: string
+          format: date
+          nullable: true
+        mesesDesdeUltimaManutencao:
+          type: integer
+          nullable: true
+        mesesLimite:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum: [PENDENTE, ENVIADO, FALHA]
+        notificacaoId:
+          type: integer
+          nullable: true
+        destinatario:
+          type: string
+          nullable: true
+        erroMensagem:
+          type: string
+          nullable: true
+        tentativas:
+          type: integer
+        dataCriacao:
+          type: string
+          format: date-time
+        dataEnvio:
+          type: string
+          format: date-time
+          nullable: true
+        dataAtualizacao:
+          type: string
+          format: date-time
+
+    VerificacaoAlertas:
+      type: object
+      properties:
+        veiculosVerificados:
+          type: integer
+        criados:
+          type: integer
+        enviados:
+          type: integer
+        pendentes:
+          type: integer
+        falhas:
+          type: integer
+        reenviados:
+          type: integer
+        ignoradosPorDuplicidade:
+          type: integer
+        alertas:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertaManutencao'
 
     VeiculoInput:
       type: object

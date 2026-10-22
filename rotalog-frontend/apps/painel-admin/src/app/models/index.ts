@@ -73,3 +73,39 @@ export enum StatusVeiculo {
   // TODO: Valores inconsistentes com o backend
   BAIXADO = 'BAIXADO'
 }
+
+// Alerta de manutenção preventiva (api-frotas, contrato C2) - JSON em camelCase
+export type StatusAlertaManutencao = 'PENDENTE' | 'ENVIADO' | 'FALHA';
+export type MotivoAlertaManutencao = 'QUILOMETRAGEM' | 'TEMPO' | 'AMBOS';
+
+export interface AlertaManutencao {
+  id: number;
+  veiculoId: number;
+  placa: string;
+  modelo: string | null;
+  motivo: MotivoAlertaManutencao;
+  quilometragemAtual: number | null;
+  limiteQuilometragem: number | null;
+  dataUltimaManutencao: string | null; // yyyy-MM-dd
+  mesesDesdeUltimaManutencao: number | null;
+  mesesLimite: number | null;
+  status: StatusAlertaManutencao;
+  notificacaoId: number | null;
+  destinatario: string | null;
+  erroMensagem: string | null;
+  tentativas: number;
+  dataCriacao: string;
+  dataEnvio: string | null;
+  dataAtualizacao: string;
+}
+
+export interface VerificacaoAlertas {
+  veiculosVerificados: number;
+  criados: number;
+  enviados: number;
+  pendentes: number;
+  falhas: number;
+  reenviados: number;
+  ignoradosPorDuplicidade: number;
+  alertas: AlertaManutencao[];
+}
