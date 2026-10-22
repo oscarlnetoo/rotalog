@@ -244,6 +244,27 @@ GET http://localhost:5000/api/notificacoes?servicoOrigem=api-frotas&tipo=VEICULO
 GET http://localhost:5000/api/notificacoes/stats
 
 ### ===========================================
+### ALERTA DE MANUTENÇÃO PREVENTIVA (chamado pelo api-frotas)
+### ===========================================
+
+### Enviar alerta (200 com ENVIADO ou FALHA; 400 se faltar veiculoId/placa/motivo)
+### Use EmailSettings__SimularFalha=false para desligar a falha simulada de 10%
+POST http://localhost:5000/api/notificacoes/alertas-manutencao
+Content-Type: application/json
+
+{
+    "veiculoId": 12,
+    "placa": "ABC1D23",
+    "modelo": "Fiat Fiorino",
+    "quilometragemAtual": 52000,
+    "limiteQuilometragem": 10000,
+    "dataUltimaManutencao": "2025-03-01",
+    "mesesLimite": 6,
+    "motivo": "QUILOMETRAGEM",
+    "destinatario": null
+}
+
+### ===========================================
 ### SWAGGER UI
 ### ===========================================
 

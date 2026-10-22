@@ -105,6 +105,7 @@ Console.WriteLine("  GET    /api/health");
 Console.WriteLine("  GET    /api/notificacoes");
 Console.WriteLine("  GET    /api/notificacoes/{id}");
 Console.WriteLine("  POST   /api/notificacoes");
+Console.WriteLine("  POST   /api/notificacoes/alertas-manutencao");
 Console.WriteLine("  POST   /api/notificacoes/{id}/reenviar");
 Console.WriteLine("  GET    /api/notificacoes/stats");
 Console.WriteLine("  GET    /api/notificacoes/templates");

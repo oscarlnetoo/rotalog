@@ -16,6 +16,16 @@ INSERT INTO templates_notificacao (tipo, canal, assunto_template, corpo_template
 ('ALERTA_MANUTENCAO', 'sms', NULL, 'RotaLog: Manutenção agendada para veículo {{placa}} em {{data_agendada}}. Verifique o sistema.', true),
 ('ENTREGA_CONCLUIDA', 'sms', NULL, 'RotaLog: Sua entrega {{numero_pedido}} foi entregue com sucesso!', true);
 
+-- Template de alerta de manutenção preventiva (idempotente)
+INSERT INTO templates_notificacao (tipo, canal, assunto_template, corpo_template, ativo)
+SELECT 'MANUTENCAO_PREVENTIVA', 'email',
+       'Manutenção preventiva necessária - Veículo {{placa}}',
+       E'O veículo {{placa}} ({{modelo}}) precisa de manutenção preventiva.\n\nMotivo: {{motivo}}\nQuilometragem atual: {{quilometragem_atual}} km\nLimite de quilometragem desde a última manutenção: {{limite_quilometragem}} km\nData da última manutenção: {{data_ultima_manutencao}}\nLimite de tempo: {{meses_limite}} meses\n\nAgende a manutenção o quanto antes.\n\nEquipe RotaLog',
+       true
+WHERE NOT EXISTS (
+    SELECT 1 FROM templates_notificacao WHERE tipo = 'MANUTENCAO_PREVENTIVA' AND canal = 'email'
+);
+
 -- Notificações de exemplo (histórico)
 INSERT INTO notificacoes (tipo, canal, destinatario, assunto, mensagem, status, tentativas, servico_origem, referencia_id, data_criacao, data_envio, data_atualizacao) VALUES
 ('VEICULO_CADASTRADO', 'email', 'operacao@rotalog.com', 'Novo veículo cadastrado: ABC1D23', 'Um novo veículo foi cadastrado no sistema RotaLog.\n\nPlaca: ABC1D23\nModelo: Fiat Fiorino\nAno: 2020\n\nEquipe RotaLog', 'ENVIADO', 1, 'api-frotas', 'veiculo-1', '2024-01-10 08:00:00', '2024-01-10 08:00:05', '2024-01-10 08:00:05'),

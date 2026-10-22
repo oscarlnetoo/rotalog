@@ -134,6 +134,112 @@ public class NotificacaoService
         return MapToResponse(notificacao);
     }
 
+    private static readonly string[] MotivosAlertaManutencao = { "QUILOMETRAGEM", "TEMPO", "AMBOS" };
+
+    /// <summary>
+    /// Enviar alerta de manutenção preventiva (api-frotas)
+    /// Uma única tentativa de envio, sem retry automático.
+    /// </summary>
+    public async Task<AlertaManutencaoResponse> EnviarAlertaManutencao(AlertaManutencaoRequest req)
+    {
+        if (req.VeiculoId == null)
+            throw new ArgumentException("Campo 'veiculoId' é obrigatório");
+        if (string.IsNullOrWhiteSpace(req.Placa))
+            throw new ArgumentException("Campo 'placa' é obrigatório");
+        if (string.IsNullOrWhiteSpace(req.Motivo))
+            throw new ArgumentException("Campo 'motivo' é obrigatório");
+
+        var motivo = req.Motivo.Trim().ToUpper();
+        if (!MotivosAlertaManutencao.Contains(motivo))
+            throw new ArgumentException("Campo 'motivo' deve ser QUILOMETRAGEM, TEMPO ou AMBOS");
+
+        var destinatario = !string.IsNullOrWhiteSpace(req.Destinatario)
+            ? req.Destinatario
+            : _configuration["AlertaManutencao:DestinatarioGestor"];
+        if (string.IsNullOrWhiteSpace(destinatario))
+            destinatario = "gestor@rotalog.com";
+
+        var variaveis = new Dictionary<string, string>
+        {
+            ["placa"] = req.Placa,
+            ["modelo"] = req.Modelo ?? "N/A",
+            ["quilometragem_atual"] = req.QuilometragemAtual?.ToString() ?? "N/A",
+            ["limite_quilometragem"] = req.LimiteQuilometragem?.ToString() ?? "N/A",
+            ["data_ultima_manutencao"] = req.DataUltimaManutencao?.ToString("dd/MM/yyyy") ?? "N/A",
+            ["meses_limite"] = req.MesesLimite?.ToString() ?? "N/A",
+            ["motivo"] = motivo
+        };
+
+        var assunto = $"Manutenção preventiva necessária - Veículo {req.Placa}";
+        string mensagem;
+
+        var template = await _context.Templates
+            .FirstOrDefaultAsync(t => t.Tipo == "MANUTENCAO_PREVENTIVA" && t.Canal == "email" && t.Ativo);
+
+        if (template != null)
+        {
+            mensagem = AplicarTemplate(template.CorpoTemplate, variaveis);
+            if (!string.IsNullOrEmpty(template.AssuntoTemplate))
+                assunto = AplicarTemplate(template.AssuntoTemplate, variaveis);
+        }
+        else
+        {
+            // Mensagem é obrigatória: fallback embutido quando o template não existe
+            mensagem = $"O veículo {req.Placa} ({variaveis["modelo"]}) precisa de manutenção preventiva.\n\n" +
+                       $"Motivo: {motivo}\n" +
+                       $"Quilometragem atual: {variaveis["quilometragem_atual"]} km (limite: {variaveis["limite_quilometragem"]} km)\n" +
+                       $"Última manutenção: {variaveis["data_ultima_manutencao"]} (limite: {variaveis["meses_limite"]} meses)\n\n" +
+                       "Equipe RotaLog";
+        }
+
+        var notificacao = new Notificacao
+        {
+            Tipo = "MANUTENCAO_PREVENTIVA",
+            Canal = "email",
+            Destinatario = destinatario,
+            Assunto = assunto,
+            Mensagem = mensagem,
+            Status = "PENDENTE",
+            ServicoOrigem = "api-frotas",
+            ReferenciaId = $"veiculo-{req.VeiculoId}",
+            DataCriacao = DateTime.UtcNow,
+            DataAtualizacao = DateTime.UtcNow
+        };
+
+        _context.Notificacoes.Add(notificacao);
+        await _context.SaveChangesAsync();
+
+        // Uma única tentativa (sem passar pela lógica de 3 tentativas do TentarEnviar)
+        notificacao.Tentativas = 1;
+        try
+        {
+            await EnviarEmail(notificacao);
+            notificacao.Status = "ENVIADO";
+            notificacao.DataEnvio = DateTime.UtcNow;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao enviar alerta de manutenção {Id}: {Msg}", notificacao.Id, ex.Message);
+            notificacao.Status = "FALHA";
+            notificacao.ErroMensagem = ex.Message;
+        }
+        notificacao.DataAtualizacao = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Alerta de manutenção {Id} veículo {Veiculo}: {Status}",
+            notificacao.Id, req.VeiculoId, notificacao.Status);
+
+        return new AlertaManutencaoResponse
+        {
+            NotificacaoId = notificacao.Id,
+            Status = notificacao.Status,
+            Destinatario = notificacao.Destinatario,
+            ErroMensagem = notificacao.ErroMensagem,
+            DataEnvio = notificacao.DataEnvio,
+            VeiculoId = req.VeiculoId.Value
+        };
+    }
+
     /// <summary>
     /// Reenviar notificação que falhou
     /// FIXME: Sem verificação de max tentativas
@@ -277,7 +383,7 @@ public class NotificacaoService
     /// FIXME: Não envia email de verdade
     /// FIXME: Credenciais SMTP no appsettings.json
     /// </summary>
-    private async Task EnviarEmail(Notificacao notificacao)
+    protected virtual async Task EnviarEmail(Notificacao notificacao)
     {
         var smtpServer = _configuration["EmailSettings:SmtpServer"];
         var smtpPort = _configuration["EmailSettings:SmtpPort"];
@@ -298,7 +404,9 @@ public class NotificacaoService
         await Task.Delay(100);
 
         // FIXME: Simula falha aleatória (10% chance)
-        if (new Random().Next(10) == 0)
+        // EmailSettings:SimularFalha=false desliga a falha simulada (usado no E2E)
+        if (_configuration.GetValue<bool>("EmailSettings:SimularFalha", true)
+            && new Random().Next(10) == 0)
         {
             throw new Exception("SMTP connection timeout (simulated)");
         }

@@ -107,6 +107,30 @@ public class NotificacoesController : ControllerBase
     }
 
     /// <summary>
+    /// Enviar alerta de manutenção preventiva (chamado pelo api-frotas)
+    /// POST /api/notificacoes/alertas-manutencao
+    /// Retorna 200 tanto para ENVIADO quanto para FALHA
+    /// </summary>
+    [HttpPost("alertas-manutencao")]
+    public async Task<IActionResult> EnviarAlertaManutencao([FromBody] AlertaManutencaoRequest request)
+    {
+        try
+        {
+            var resposta = await _service.EnviarAlertaManutencao(request);
+            return Ok(resposta);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao enviar alerta de manutenção");
+            return StatusCode(500, new { error = "Erro ao enviar alerta de manutenção", detalhes = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// Reenviar notificação
     /// POST /api/notificacoes/{id}/reenviar
     /// </summary>
