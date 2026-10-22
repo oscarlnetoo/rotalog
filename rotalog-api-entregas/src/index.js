@@ -41,7 +41,9 @@ require('./models');
 
 // Middleware
 const { createAuthMiddleware } = require('./middleware/auth');
-const authMiddleware = createAuthMiddleware(authConfig);
+const { createAuthorize } = require('./middleware/authorize');
+const authenticate = createAuthMiddleware(authConfig);
+const requireRole = createAuthorize(authConfig);
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 // FIXME: CORS permite tudo - inseguro
@@ -86,9 +88,10 @@ app.get('/api/health', (req, res) => {
 });
 
 // Mount routes
-app.use('/api/entregas', authMiddleware, entregasRoutes);
-app.use('/api/rastreamento', rastreamentoRoutes); // FIXME: sem auth no rastreamento
-app.use('/api/frotas', authMiddleware, frotasRoutes);
+const routerDeps = { authenticate: authenticate, requireRole: requireRole };
+app.use('/api/entregas', authenticate, entregasRoutes(routerDeps));
+app.use('/api/rastreamento', rastreamentoRoutes(routerDeps)); // GETs públicos; POST autentica na rota
+app.use('/api/frotas', authenticate, frotasRoutes(routerDeps));
 
 // Error handling
 app.use(notFoundHandler);
