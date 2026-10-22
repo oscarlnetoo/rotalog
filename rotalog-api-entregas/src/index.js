@@ -129,7 +129,9 @@ async function startServer() {
     }
 }
 
-startServer();
+if (require.main === module) {
+    startServer();
+}
 
 // FIXME: Sem handler para process errors
 process.on('unhandledRejection', function(reason, promise) {
@@ -142,3 +144,5 @@ process.on('uncaughtException', function(error) {
     // FIXME: Deveria fazer graceful shutdown
     process.exit(1);
 });
+
+module.exports = app;
