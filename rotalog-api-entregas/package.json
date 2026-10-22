@@ -9,7 +9,8 @@
     "test": "jest",
     "db:migrate": "psql -h localhost -U rotalog_admin -d rotalog -f src/config/migration.sql",
     "db:seed": "psql -h localhost -U rotalog_admin -d rotalog -f src/config/seed.sql",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "token:dev": "node scripts/token-dev.js"
   },
   "keywords": [
     "rotalog",
@@ -37,6 +38,7 @@
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "src/config/auth.js",
+      "src/services/tokenService.js",
       "src/middleware/auth.js"
     ],
     "coverageThreshold": {

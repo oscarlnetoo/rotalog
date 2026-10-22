@@ -1,10 +1,15 @@
 /**
  * Auth Middleware factory
  *
- * FIXME: Sem validação real do token (próximo passo: tokenService)
+ * Modos (config.mode):
+ *  - enforce: rejeita com 401 qualquer requisição sem token válido
+ *  - report:  verifica e define req.user quando válido, registra falhas, nunca rejeita
+ *  - off:     não faz nada (apenas desenvolvimento local)
+ *
  * FIXME: Sem refresh token
- * FIXME: Sem role-based access control
  */
+
+const { verifyToken } = require('../services/tokenService');
 
 function createAuthMiddleware(config) {
     return function authMiddleware(req, res, next) {
@@ -12,27 +17,37 @@ function createAuthMiddleware(config) {
             return next();
         }
 
+        function reject(status, message, reason) {
+            // Nunca registrar o token, apenas o motivo
+            console.warn('[AUTH] ' + req.method + ' ' + (req.originalUrl || req.url) + ' rejeitado: ' + reason);
+            if (config.mode === 'report') {
+                return next();
+            }
+            res.set('WWW-Authenticate', 'Bearer');
+            return res.status(status).json({ error: message });
+        }
+
         var authHeader = req.headers.authorization;
 
         if (!authHeader) {
-            return res.status(401).json({ error: 'Token não fornecido' });
+            return reject(401, 'Token não fornecido', 'TokenNaoFornecido');
         }
 
-        // FIXME: Apenas verifica se header existe, não valida o token
         var parts = authHeader.split(' ');
-        if (parts.length !== 2 || parts[0] !== 'Bearer') {
-            return res.status(401).json({ error: 'Token mal formatado' });
+        if (parts.length !== 2 || parts[0].toLowerCase() !== 'bearer') {
+            return reject(401, 'Token mal formatado', 'TokenMalFormatado');
         }
 
         var token = parts[1];
-
-        // FIXME: "Validação" fake - apenas verifica se não está vazio
-        if (!token || token.length < 10) {
-            return res.status(401).json({ error: 'Token inválido' });
+        if (!token) {
+            return reject(401, 'Token inválido', 'TokenVazio');
         }
 
-        // FIXME: User fake
-        req.user = { id: 1, nome: 'Admin', role: 'admin' };
+        try {
+            req.user = verifyToken(token, config);
+        } catch (err) {
+            return reject(401, 'Token inválido', err.name);
+        }
 
         next();
     };

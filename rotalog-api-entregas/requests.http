@@ -1,3 +1,7 @@
+### Token de teste (AUTH_MODE=enforce/report): npm run token:dev -- --role operador
+### Cole o token impresso abaixo. Em AUTH_MODE=off o header é ignorado.
+@token = COLE_O_TOKEN_AQUI
+
 ### RotaLog - API Entregas - HTTP Requests para testes
 ### Usar com REST Client (VS Code) ou similar
 
@@ -14,27 +18,35 @@ GET http://localhost:3000/api/health
 
 ### Listar todas as entregas
 GET http://localhost:3000/api/entregas
+Authorization: Bearer {{token}}
 
 ### Listar entregas por status
 GET http://localhost:3000/api/entregas?status=PENDENTE
+Authorization: Bearer {{token}}
 
 ### Listar entregas por veículo (usado pelo api-frotas)
 GET http://localhost:3000/api/entregas?veiculo=ABC1D23
+Authorization: Bearer {{token}}
 
 ### Listar entregas por motorista
 GET http://localhost:3000/api/entregas?motorista_id=1
+Authorization: Bearer {{token}}
 
 ### Buscar entrega por ID
 GET http://localhost:3000/api/entregas/1
+Authorization: Bearer {{token}}
 
 ### Buscar entrega por número do pedido
 GET http://localhost:3000/api/entregas/pedido/PED-2024-001
+Authorization: Bearer {{token}}
 
 ### Estatísticas de entregas
 GET http://localhost:3000/api/entregas/stats
+Authorization: Bearer {{token}}
 
 ### Criar nova entrega
 POST http://localhost:3000/api/entregas
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -50,6 +62,7 @@ Content-Type: application/json
 
 ### Atualizar entrega
 PUT http://localhost:3000/api/entregas/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -60,6 +73,7 @@ Content-Type: application/json
 
 ### Atribuir veículo e motorista à entrega
 PATCH http://localhost:3000/api/entregas/5/atribuir
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -69,6 +83,7 @@ Content-Type: application/json
 
 ### Atualizar status para EM_TRANSITO
 PATCH http://localhost:3000/api/entregas/5/status
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -77,6 +92,7 @@ Content-Type: application/json
 
 ### Atualizar status para ENTREGUE
 PATCH http://localhost:3000/api/entregas/5/status
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -85,6 +101,7 @@ Content-Type: application/json
 
 ### Cancelar entrega (soft delete)
 DELETE http://localhost:3000/api/entregas/6
+Authorization: Bearer {{token}}
 
 ### ===========================================
 ### RASTREAMENTO
@@ -101,6 +118,7 @@ GET http://localhost:3000/api/rastreamento/pedido/PED-2024-003
 
 ### Registrar evento de rastreamento (posição GPS)
 POST http://localhost:3000/api/rastreamento/3
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -112,6 +130,7 @@ Content-Type: application/json
 
 ### Registrar evento de rastreamento (parada)
 POST http://localhost:3000/api/rastreamento/3
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -127,15 +146,19 @@ Content-Type: application/json
 
 ### Listar veículos disponíveis (proxy para api-frotas)
 GET http://localhost:3000/api/frotas/veiculos/disponiveis
+Authorization: Bearer {{token}}
 
 ### Buscar veículo por placa (proxy para api-frotas)
 GET http://localhost:3000/api/frotas/veiculos/ABC1D23
+Authorization: Bearer {{token}}
 
 ### Verificar disponibilidade de veículo
 GET http://localhost:3000/api/frotas/veiculos/ABC1D23/disponibilidade
+Authorization: Bearer {{token}}
 
 ### Buscar motorista por ID (proxy para api-frotas)
 GET http://localhost:3000/api/frotas/motoristas/1
+Authorization: Bearer {{token}}
 
 ### ===========================================
 ### FLUXO COMPLETO DE ENTREGA
@@ -143,6 +166,7 @@ GET http://localhost:3000/api/frotas/motoristas/1
 
 ### 1. Criar nova entrega
 POST http://localhost:3000/api/entregas
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -158,9 +182,11 @@ Content-Type: application/json
 
 ### 2. Verificar disponibilidade do veículo
 GET http://localhost:3000/api/frotas/veiculos/NOP3Q45/disponibilidade
+Authorization: Bearer {{token}}
 
 ### 3. Atribuir veículo e motorista (substituir ID da entrega criada)
 PATCH http://localhost:3000/api/entregas/11/atribuir
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -170,6 +196,7 @@ Content-Type: application/json
 
 ### 4. Iniciar trânsito
 PATCH http://localhost:3000/api/entregas/11/status
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -178,6 +205,7 @@ Content-Type: application/json
 
 ### 5. Registrar posição GPS durante trânsito
 POST http://localhost:3000/api/rastreamento/11
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -189,6 +217,7 @@ Content-Type: application/json
 
 ### 6. Concluir entrega
 PATCH http://localhost:3000/api/entregas/11/status
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {

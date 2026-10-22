@@ -16,6 +16,7 @@ describe('montagem das rotas (caracterização, NODE_ENV=production)', () => {
         process.env.JWT_SECRET = 'test-secret-with-at-least-32-bytes!!';
         jest.spyOn(console, 'log').mockImplementation(() => {});
         jest.spyOn(console, 'error').mockImplementation(() => {});
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
         app = require('../../src/index');
     });
 
