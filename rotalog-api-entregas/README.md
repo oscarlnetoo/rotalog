@@ -26,21 +26,13 @@ The database schema and seed data are created by `rotalog-workspace`; the SQL sc
     npm install
     ```
 
-3. Configure the environment variables in the `.env` file
+3. Create your local `.env` from the example and fill in the placeholders (`.env` is not versioned)
 
     ```bash
-    NODE_ENV=development
-    PORT=3000
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_NAME=rotalog
-    DB_USER=rotalog_admin
-    DB_PASSWORD=ENTER YOUR DB PASSWORD
-    DB_SCHEMA=entregas
-    JWT_SECRET=ENTER YOUR JWT SECRET
-    API_FROTAS_URL=http://localhost:8080/api
-    API_NOTIFICACOES_URL=http://localhost:5000
+    cp .env.example .env
     ```
+
+    Authentication is controlled by `AUTH_MODE` (`enforce` is the default when unset, `report` verifies tokens but never rejects, `off` disables auth and is refused when `NODE_ENV=production`). With `enforce` or `report`, `JWT_SECRET` must have at least 32 bytes; the service refuses to start otherwise.
 
 4. (Optional) Run the migration and seed scripts manually
 
@@ -58,7 +50,7 @@ npm run dev
 curl http://localhost:3000/api/health
 ```
 
-Authentication is bypassed when `NODE_ENV` is not `production`; in production, requests to `/api/entregas` and `/api/frotas` need an `Authorization: Bearer <token>` header. Main endpoints:
+Authentication depends on `AUTH_MODE`, not on `NODE_ENV`: unless it is `off` (local development only), requests to `/api/entregas` and `/api/frotas` need an `Authorization: Bearer <token>` header. For manual testing, `npm run token:dev -- --role operador` prints a signed token (roles: `admin`, `operador`, `motorista`, `servico`). Main endpoints:
 
 ```text
 GET    /api/entregas

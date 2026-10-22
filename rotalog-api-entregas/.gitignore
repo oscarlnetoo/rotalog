@@ -41,8 +41,7 @@ coverage/
 Thumbs.db
 
 # Environment
-# FIXME: .env deveria estar aqui mas foi commitado intencionalmente
-# .env
+.env
 .env.local
 .env.*.local
 
