@@ -39,7 +39,8 @@
     "collectCoverageFrom": [
       "src/config/auth.js",
       "src/services/tokenService.js",
-      "src/middleware/auth.js"
+      "src/middleware/auth.js",
+      "src/middleware/authorize.js"
     ],
     "coverageThreshold": {
       "global": {

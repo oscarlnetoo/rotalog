@@ -35,13 +35,12 @@ describe('loadAuthConfig', () => {
         expect(config.algorithms).toEqual(['HS256', 'HS384']);
     });
 
-    it.each(['foo', 'ENFORCE', ''])('rejeita AUTH_MODE inválido (%p) quando informado', (mode) => {
-        if (mode === '') {
-            // string vazia cai no padrão enforce
-            expect(loadAuthConfig({ AUTH_MODE: mode, JWT_SECRET: SECRET }).mode).toBe('enforce');
-            return;
-        }
+    it.each(['foo', 'ENFORCE'])('rejeita AUTH_MODE inválido (%p)', (mode) => {
         expect(() => loadAuthConfig({ AUTH_MODE: mode, JWT_SECRET: SECRET })).toThrow(/AUTH_MODE inválido/);
+    });
+
+    it('trata AUTH_MODE vazio como não definido (enforce)', () => {
+        expect(loadAuthConfig({ AUTH_MODE: '', JWT_SECRET: SECRET }).mode).toBe('enforce');
     });
 
     it('rejeita AUTH_MODE=off em produção', () => {
