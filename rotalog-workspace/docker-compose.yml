@@ -20,6 +20,8 @@ services:
       - ./tools/scripts/06-seed-entregas.sql:/docker-entrypoint-initdb.d/06-seed-entregas.sql
       - ./tools/scripts/07-seed-notificacoes.sql:/docker-entrypoint-initdb.d/07-seed-notificacoes.sql
       - ./tools/scripts/08-add-motorista-veiculo-info.sql:/docker-entrypoint-initdb.d/08-add-motorista-veiculo-info.sql
+      - ./tools/scripts/09-add-alertas-manutencao.sql:/docker-entrypoint-initdb.d/09-add-alertas-manutencao.sql
+      - ./tools/scripts/10-seed-template-manutencao-preventiva.sql:/docker-entrypoint-initdb.d/10-seed-template-manutencao-preventiva.sql
     networks:
       - rotalog-network
     # TODO: Add health checks

@@ -44,6 +44,8 @@ The init scripts in `tools/scripts/` run in this order on the first start:
 | `06-seed-entregas.sql` | Delivery seed data |
 | `07-seed-notificacoes.sql` | Notification seed data |
 | `08-add-motorista-veiculo-info.sql` | Driver/vehicle info on deliveries |
+| `09-add-alertas-manutencao.sql` | Preventive maintenance alerts table (`frotas`) |
+| `10-seed-template-manutencao-preventiva.sql` | `MANUTENCAO_PREVENTIVA` email template seed |
 
 ## Using the Project
 
