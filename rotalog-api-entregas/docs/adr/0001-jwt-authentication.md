@@ -1,6 +1,6 @@
 # ADR 0001: Replace the fake auth middleware with real JWT verification and per-route authorization
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-10-22
 - **Scope:** `rotalog-api-entregas`: `src/middleware/auth.js`, how it is mounted in `src/index.js`, and the secrets it depends on
 - **Related:** [`TECH_DEBT_MAP.md`](../../../TECH_DEBT_MAP.md), section 2 (Security vulnerabilities, rows 1–3)
